@@ -1,13 +1,18 @@
-var builder = WebApplication.CreateBuilder(args);
+using BuberDinner.Application;
+using BuberDinner.Application.Services.Authentication;
+using BuberDinner.Contracts.Authentication;
+using BuberDinner.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services
+    .AddApplication()
+    .AddInfrastructure();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -16,29 +21,44 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapPost("/auth/register", (
+        IAuthenticationService authenticationService,
+        [FromBody] RegisterRequest request) =>
+    {
+        var authResult = authenticationService.Register(
+            request.FirstName,
+            request.LastName,
+            request.Email,
+            request.Password);
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+        var response = new AuthenticationResponse(
+            authResult.Id,
+            authResult.FirstName,
+            authResult.LastName,
+            authResult.Email,
+            authResult.Token);
+
+        return Task.FromResult(Results.Ok(response));
+    })
+    .WithName("Register")
+    .WithOpenApi();
+
+app.MapPost("/auth/login", (IAuthenticationService authenticationService, [FromBody] LoginRequest request) =>
+    {
+        var loginResult = authenticationService.Login(
+            request.Email,
+            request.Password);
+
+        var response = new AuthenticationResponse(
+            loginResult.Id,
+            loginResult.FirstName,
+            loginResult.LastName,
+            loginResult.Email,
+            loginResult.Token);
+
+        return Task.FromResult(Results.Ok(response));
+    })
+    .WithName("Login")
+    .WithOpenApi();
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
