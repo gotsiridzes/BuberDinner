@@ -32,10 +32,10 @@ app.MapPost("/auth/register", (
             request.Password);
 
         var response = new AuthenticationResponse(
-            authResult.Id,
-            authResult.FirstName,
-            authResult.LastName,
-            authResult.Email,
+            authResult.User.Id,
+            authResult.User.FirstName,
+            authResult.User.LastName,
+            authResult.User.Email,
             authResult.Token);
 
         return Task.FromResult(Results.Ok(response));
@@ -50,10 +50,10 @@ app.MapPost("/auth/login", (IAuthenticationService authenticationService, [FromB
             request.Password);
 
         var response = new AuthenticationResponse(
-            loginResult.Id,
-            loginResult.FirstName,
-            loginResult.LastName,
-            loginResult.Email,
+            loginResult.User.Id,
+            loginResult.User.FirstName,
+            loginResult.User.LastName,
+            loginResult.User.Email,
             loginResult.Token);
 
         return Task.FromResult(Results.Ok(response));
