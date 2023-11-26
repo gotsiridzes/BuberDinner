@@ -21,6 +21,4 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.UseExceptionHandler("/errors");
 
-
-
 app.Run();
