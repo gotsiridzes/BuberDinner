@@ -1,9 +1,10 @@
 ﻿using System.Net;
-using BuberDinner.Application.Services.Authentication;
-using BuberDinner.Application.Services.Authentication.Commands;
-using BuberDinner.Application.Services.Authentication.Queries;
+using BuberDinner.Application.Authentication.Commands.Register;
+using BuberDinner.Application.Authentication.Common;
+using BuberDinner.Application.Authentication.Queries.Login;
 using BuberDinner.Contracts.Authentication;
 using ErrorOr;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuberDinner.Api.Controllers
@@ -11,24 +12,19 @@ namespace BuberDinner.Api.Controllers
     [Route("[controller]")]
     public class AuthController : ApiController
     {
-        private readonly IAuthenticationCommandService _authenticationCommandService;
-        private readonly IAuthenticationQueryService _authenticationQueryService;
+        private readonly ISender _sender;
 
-        public AuthController(IAuthenticationCommandService authenticationCommandService,
-            IAuthenticationQueryService authenticationQueryService)
+        public AuthController(ISender sender)
         {
-            _authenticationCommandService = authenticationCommandService;
-            _authenticationQueryService = authenticationQueryService;
+            _sender = sender;
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            ErrorOr<AuthenticationResult> registerResult = _authenticationCommandService.Register(
-                request.FirstName,
-                request.LastName,
-                request.Email,
-                request.Password);
+            var command = new RegisterCommand(request.FirstName, request.LastName, request.Email, request.Password);
+
+            ErrorOr<AuthenticationResult> registerResult = await _sender.Send(command);
 
             return registerResult.Match(
                 authResult => Ok(MapAuthResult(authResult)),
@@ -43,15 +39,15 @@ namespace BuberDinner.Api.Controllers
                 authResult.User.LastName,
                 authResult.User.Email,
                 authResult.Token);
+
             return response;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var loginResult = _authenticationQueryService.Login(
-                request.Email,
-                request.Password);
+            var command = new LoginQuery(request.Email, request.Password);
+            ErrorOr<AuthenticationResult> loginResult = await _sender.Send(command);
 
             return loginResult.Match(
                 authResult => Ok(MapAuthResult(authResult)),
