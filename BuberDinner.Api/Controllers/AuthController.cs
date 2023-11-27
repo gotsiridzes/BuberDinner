@@ -1,13 +1,13 @@
-﻿using BuberDinner.Application.Services.Authentication;
+﻿using System.Net;
+using BuberDinner.Application.Services.Authentication;
 using BuberDinner.Contracts.Authentication;
-using Microsoft.AspNetCore.Http;
+using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuberDinner.Api.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiController
     {
         private readonly IAuthenticationService _authenticationService;
 
@@ -17,39 +17,40 @@ namespace BuberDinner.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<AuthenticationResponse>> Register([FromBody] RegisterRequest request)
+        public IActionResult Register([FromBody] RegisterRequest request)
         {
-            var authResult = _authenticationService.Register(
+            ErrorOr<AuthenticationResult> registerResult = _authenticationService.Register(
                 request.FirstName,
                 request.LastName,
                 request.Email,
                 request.Password);
 
+            return registerResult.Match(
+                authResult => Ok(MapAuthResult(authResult)),
+                errors => Problem(errors));
+        }
+
+        private static AuthenticationResponse MapAuthResult(AuthenticationResult authResult)
+        {
             var response = new AuthenticationResponse(
                 authResult.User.Id,
                 authResult.User.FirstName,
                 authResult.User.LastName,
                 authResult.User.Email,
                 authResult.Token);
-
-            return Ok(response);
+            return response;
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<AuthenticationResponse>> Login([FromBody] LoginRequest request)
+        public IActionResult Login([FromBody] LoginRequest request)
         {
             var loginResult = _authenticationService.Login(
                 request.Email,
                 request.Password);
 
-            var response = new AuthenticationResponse(
-                loginResult.User.Id,
-                loginResult.User.FirstName,
-                loginResult.User.LastName,
-                loginResult.User.Email,
-                loginResult.Token);
-
-            return Ok(response);
+            return loginResult.Match(
+                authResult => Ok(MapAuthResult(authResult)),
+                errors => Problem(errors));
         }
     }
 }
