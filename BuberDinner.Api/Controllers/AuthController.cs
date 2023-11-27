@@ -4,6 +4,7 @@ using BuberDinner.Application.Authentication.Common;
 using BuberDinner.Application.Authentication.Queries.Login;
 using BuberDinner.Contracts.Authentication;
 using ErrorOr;
+using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,44 +14,37 @@ namespace BuberDinner.Api.Controllers
     public class AuthController : ApiController
     {
         private readonly ISender _sender;
+        private readonly IMapper _mapper;
 
-        public AuthController(ISender sender)
+        public AuthController(
+            ISender sender,
+            IMapper mapper)
         {
             _sender = sender;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var command = new RegisterCommand(request.FirstName, request.LastName, request.Email, request.Password);
-
+            var command = _mapper.Map<RegisterCommand>(request);
+            //var command = new RegisterCommand(request.FirstName, request.LastName, request.Email, request.Password);
             ErrorOr<AuthenticationResult> registerResult = await _sender.Send(command);
 
             return registerResult.Match(
-                authResult => Ok(MapAuthResult(authResult)),
+                authResult => Ok(_mapper.Map<AuthenticationResponse>(authResult)),
                 errors => Problem(errors));
         }
-
-        private static AuthenticationResponse MapAuthResult(AuthenticationResult authResult)
-        {
-            var response = new AuthenticationResponse(
-                authResult.User.Id,
-                authResult.User.FirstName,
-                authResult.User.LastName,
-                authResult.User.Email,
-                authResult.Token);
-
-            return response;
-        }
-
+        
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var command = new LoginQuery(request.Email, request.Password);
+            var command = _mapper.Map<LoginQuery>(request);
+            //var command = new LoginQuery(request.Email, request.Password);
             ErrorOr<AuthenticationResult> loginResult = await _sender.Send(command);
 
             return loginResult.Match(
-                authResult => Ok(MapAuthResult(authResult)),
+                authResult => Ok(_mapper.Map<AuthenticationResponse>(authResult)),
                 errors => Problem(errors));
         }
     }
