@@ -18,10 +18,10 @@ POST {{host}}/auth/register
 #### Register Request
 ```json
 {
-    "firstName": "Saba",
-    "lastName": "Gotsiridze",
-    "email": "saba@gotsiridze.com",
-    "password": "asdASD123"
+    "firstName": "",
+    "lastName": "",
+    "email": "",
+    "password": ""
 }
 ```
 
@@ -38,8 +38,8 @@ POST {{host}}/auth/login
 #### Login Request
 ```json
 {
-    "email":"saba@gotsiridze.com",
-    "password": "asdASD123"
+    "email":"",
+    "password": ""
 }
 ```
 
