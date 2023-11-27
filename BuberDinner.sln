@@ -19,8 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{60491681
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{199D0466-B469-4A36-A205-5ACBE0AB1271}"
 	ProjectSection(SolutionItems) = preProject
-		Api.md = Api.md
-		Domain.md = Domain.md
+		Docs/Api.md = Docs/Api.md
+		Docs/Domain.md = Docs/Domain.md
 	EndProjectSection
 EndProject
 Global
