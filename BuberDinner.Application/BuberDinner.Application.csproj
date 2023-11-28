@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Authentication\Common\" />
-    <Folder Include="Authentication\Queries\Login\" />
     <Folder Include="Common\Interfaces\Authentication\" />
     <Folder Include="Common\Persistence\" />
   </ItemGroup>
