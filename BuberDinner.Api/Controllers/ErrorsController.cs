@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BuberDinner.Api.Controllers;
 
 [Route("[controller]")]
-public class Errors : ControllerBase
+public class ErrorsController : ControllerBase
 {
     public async Task<ActionResult> Error()
     {
