@@ -28,8 +28,7 @@ namespace BuberDinner.Api.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             var command = _mapper.Map<RegisterCommand>(request);
-            //var command = new RegisterCommand(request.FirstName, request.LastName, request.Email, request.Password);
-            ErrorOr<AuthenticationResult> registerResult = await _sender.Send(command);
+            var registerResult = await _sender.Send(command);
 
             return registerResult.Match(
                 authResult => Ok(_mapper.Map<AuthenticationResponse>(authResult)),
@@ -41,7 +40,7 @@ namespace BuberDinner.Api.Controllers
         {
             var command = _mapper.Map<LoginQuery>(request);
             //var command = new LoginQuery(request.Email, request.Password);
-            ErrorOr<AuthenticationResult> loginResult = await _sender.Send(command);
+            var loginResult = await _sender.Send(command);
 
             return loginResult.Match(
                 authResult => Ok(_mapper.Map<AuthenticationResponse>(authResult)),
