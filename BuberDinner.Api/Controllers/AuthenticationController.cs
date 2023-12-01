@@ -5,6 +5,7 @@ using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+// ReSharper disable ConvertClosureToMethodGroup
 
 namespace BuberDinner.Api.Controllers;
 

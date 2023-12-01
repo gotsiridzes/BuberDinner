@@ -9,6 +9,7 @@ public class ErrorsController : ControllerBase
 {
     public async Task<ActionResult> Error()
     {
+        await Task.CompletedTask;
         var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
         var (statusCode, message) = exception switch
         {

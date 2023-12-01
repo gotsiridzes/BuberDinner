@@ -14,7 +14,7 @@ public class BuberDinnerProblemDetailsFactory : ProblemDetailsFactory
 
     public BuberDinnerProblemDetailsFactory(IOptions<ApiBehaviorOptions> options)
     {
-        _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+        _options = options.Value ?? throw new ArgumentNullException(nameof(options));
     }
 
     public override ProblemDetails CreateProblemDetails(HttpContext httpContext, int? statusCode = null,
@@ -72,7 +72,7 @@ public class BuberDinnerProblemDetailsFactory : ProblemDetailsFactory
         var traceId = Activity.Current?.Id ?? httpContext.TraceIdentifier;
         problemDetails.Extensions["traceId"] = traceId;
 
-        if (httpContext?.Items[HttpContextItemKeys.Errors] is List<Error> errors)
+        if (httpContext.Items[HttpContextItemKeys.Errors] is List<Error> errors)
             problemDetails.Extensions.Add("errorCodes", errors.Select(e => e.Code));
     }
 }
