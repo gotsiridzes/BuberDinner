@@ -15,7 +15,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
     private readonly JwtSettings _jwtSettings;
 
     public JwtTokenGenerator(
-        IDateTimeProvider dateTimeProvider, 
+        IDateTimeProvider dateTimeProvider,
         IOptions<JwtSettings> options)
     {
         _dateTimeProvider = dateTimeProvider;

@@ -36,7 +36,7 @@ public class ApiController : ControllerBase
 
         return Problem(statusCode: statusCode, title: error.Description);
     }
-    
+
     private IActionResult ValidationProblem(List<Error> errors)
     {
         var modelStateDictionary = new ModelStateDictionary();
